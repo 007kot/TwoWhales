@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const apartmentData = document.getElementById('apartment_data');
     const parkingData = document.getElementById('parking_data');
     const totalArea = document.getElementById('total_area');
+    const installmentCheckbox = document.getElementById('supportCheckbox');
 
     function setDateLimits() {
         const today = new Date();
@@ -29,12 +30,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Для "рассрочки" - включаем поля
             initialPaymentInput.disabled = false;
             installmentPeriodInput.disabled = false;
+            installmentCheckbox.disabled = false;
         }else {
             // Для "налички" и другого - дизейблим и очищаем поля
             initialPaymentInput.disabled = true;
             installmentPeriodInput.disabled = true;
             initialPaymentInput.value = '';
             installmentPeriodInput.value = '';
+            installmentCheckbox.disabled = true;
         }
     }
 
@@ -92,21 +95,16 @@ document.addEventListener('DOMContentLoaded', function() {
 async function generateContract() {
     try {
         // 1. Собираем данные из формы
-        console.log('1');
         const formData = collectFormData();
-        console.log('2');
 
         // 2. Загружаем и заполняем DOCX шаблон
         const docxBuffer = await fillDocxTemplate(formData);
-        console.log('3');
 
         // 3. Конвертируем DOCX в PDF
         const pdfBlob = await convertDocxToPdf(docxBuffer);
-        console.log('4');
 
         // 4. Скачиваем PDF
         downloadFile(pdfBlob, 'договор.docx');
-                console.log('5');
 
     } catch (error) {
         console.error('Ошибка:', error);
@@ -124,7 +122,6 @@ function collectFormData() {
     const isApartmentType = document.getElementById('property_type').value === "apartment";
 
     if(isApartmentType){
-        console.log('test')
         return {
             isCashContract: document.getElementById('contract').value === "cash",
             isApartmentType: isApartmentType,
@@ -282,10 +279,16 @@ function displayPaymentPreview() {
         const initialPayment = parseFloat(document.getElementById('initial_payment').value) || 0;
         const pricePerSquare = parseFloat(document.getElementById('price_per_square').value) || 0;
         const totalArea = parseFloat(document.getElementById('total_area').value) || 0;
-        const currentDate = document.getElementById('current_date').value;
-        
+        let currentDate = document.getElementById('current_date').value;
+        const installmentCheckbox = document.getElementById('supportCheckbox').checked;
+
+        if(installmentCheckbox) {
+            currentDate = new Date(currentDate);
+            currentDate.setMonth(currentDate.getMonth() + 1);
+        }
+
         const payments = generatePaymentTable(initialPayment, pricePerSquare, totalArea, installmentPeriod, currentDate);
-        
+
         // Показываем превью таблицы на странице
         const previewContainer = document.getElementById('payment-preview');
         if (previewContainer) {
@@ -393,9 +396,16 @@ function getPaymentDataForWord() {
     const initialPayment = parseFloat(document.getElementById('initial_payment').value) || 0;
     const pricePerSquare = parseFloat(document.getElementById('price_per_square').value) || 0;
     const totalArea = parseFloat(document.getElementById('total_area').value) || 0;
-    const currentDate = document.getElementById('current_date').value;
-    const payments = generatePaymentTable(initialPayment, pricePerSquare, totalArea, installmentPeriod, currentDate);
+    let currentDate = document.getElementById('current_date').value;
+    const installmentCheckbox = document.getElementById('supportCheckbox').checked;
 
+    if(installmentCheckbox) {
+        currentDate = new Date(currentDate);
+        currentDate.setMonth(currentDate.getMonth() + 1);
+    }
+
+    const payments = generatePaymentTable(initialPayment, pricePerSquare, totalArea, installmentPeriod, currentDate);
+    
     const paymentTable = payments.map(payment => ({
         number: payment.number.toString(),
         payment: payment.payment,

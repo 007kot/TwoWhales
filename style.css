@@ -215,3 +215,50 @@ select:focus {
     display: flex;
     justify-content: space-between;
 }
+
+#supportCheckbox:checked ~ div span {
+    opacity: 1;
+}
+
+#supportCheckbox:checked ~ div {
+    background: #6a64f1;
+    border-color: #6a64f1;
+}
+
+.formbold-checkbox-label {
+    display: flex;
+    cursor: pointer;
+    user-select: none;
+    font-size: 16px;
+    line-height: 24px;
+    color: #536387;
+}
+
+.formbold-checkbox-label a {
+    margin-left: 5px;
+    color: #6a64f1;
+}
+
+.formbold-input-checkbox {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.formbold-checkbox-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-right: 16px;
+    margin-top: 2px;
+    border: 0.7px solid #dde3ec;
+    border-radius: 3px;
+}
