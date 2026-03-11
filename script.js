@@ -69,9 +69,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     submitBtn.addEventListener('click', function(event) {
         event.preventDefault(); 
-        console.log('0');
+
         const form = document.querySelector('form');
-        console.log('00');
+
         if (form.checkValidity()) {
             generateContract();
         } else {
@@ -311,21 +311,24 @@ function generatePaymentTable(initialPayment, pricePerSquare, totalArea, install
         date: formatDate(firstPaymentDate),
         remaining: formatCurrency(installmentAmount)
     });
-    
-    if (new Date(currentDate).getDate() > 15) {
-        // Если дата > 15 числа, первый платеж 1 числа через месяц
-        firstPaymentDate.setMonth(firstPaymentDate.getMonth() + 2);
-        firstPaymentDate.setDate(1);
-    } else {
-        // Если дата <= 15 числа, первый платеж 1 числа следующего месяца
-        firstPaymentDate.setMonth(firstPaymentDate.getMonth() + 1);
-        firstPaymentDate.setDate(1);
-    }
 
     for (let i = 0; i < installmentPeriod; i++) {
         const paymentDate = new Date(firstPaymentDate);
-        paymentDate.setMonth(firstPaymentDate.getMonth() + i);
-        
+        paymentDate.setDate(1);
+        paymentDate.setMonth(firstPaymentDate.getMonth() + (i + 1));
+
+        const lastDayOfMonth = new Date(
+            paymentDate.getFullYear(),
+            paymentDate.getMonth() + 1,
+            0
+        ).getDate();
+
+        if (firstPaymentDate.getDate() > lastDayOfMonth) {
+            paymentDate.setDate(lastDayOfMonth);
+        } else {
+            paymentDate.setDate(firstPaymentDate.getDate());
+        }
+
         // Форматируем дату в DD.MM.YYYY
         const formattedDate = formatDate(paymentDate);
         
