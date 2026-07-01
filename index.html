@@ -3,27 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Два Кита — Договор купли-продажи</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.66.3/docxtemplater.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pizzip@3.2.0/dist/pizzip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.9/inputmask.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.9/bindings/inputmask.binding.min.js"></script>    
-    <script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.66.5/build/docxtemplater.min.js"></script>    
-    <script src="https://cdn.jsdelivr.net/npm/docxtemplater-table-module@1.2.0/dist/table.js"></script>
-    <script src="./script.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    </style>
+
+    <!-- defer, чтобы скрипты не блокировали первую отрисовку страницы —
+         в Safari это особенно заметно как "рваная" загрузка стилей -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.66.3/docxtemplater.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/pizzip@3.2.0/dist/pizzip.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.9/inputmask.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.9/bindings/inputmask.binding.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/docxtemplater@3.66.5/build/docxtemplater.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/docxtemplater-table-module@1.2.0/dist/table.js"></script>
+    <script defer src="./script.js"></script>
 </head>
 <body>
     <div class="formbold-main-wrapper">
         <div class="formbold-form-wrapper">
             <form action="https://formbold.com/s/FORM_ID" method="POST">
                 <div class="formbold-form-title">
-                    <h2 class="">Два Кита</h2>
+                    <span class="form-eyebrow">Договор купли-продажи недвижимости</span>
+                    <div class="brand-lockup">
+                        <img src="logo-mark.png" alt="Два Кита" class="brand-logo" width="120" height="111">
+                        <h2 class="brand-title">Два Кита</h2>
+                    </div>
                     <p>
                         Заполните все активные поля перед генерацией файла
                     </p>
