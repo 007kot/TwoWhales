@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const apartmentData = document.getElementById('apartment_data');
     const parkingData = document.getElementById('parking_data');
+    const roomsField = document.getElementById('rooms_field');
+    const roomsInput = document.getElementById('rooms');
     const totalArea = document.getElementById('total_area');
     const installmentCheckbox = document.getElementById('supportCheckbox');
 
@@ -42,17 +44,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updatePropertyFields() {
-        if (propertySelect.value === 'parking') {
-            // Для "парковки" - включаем поля парковки
-            apartmentData.style.display = 'none';
-            parkingData.style.display = 'block'; 
+        const propertyType = propertySelect.value;
+        const isParking = propertyType === 'parking';
+        // Коммерция использует тот же набор полей, что и квартира, но без комнат
+        const isCommerce = propertyType === 'commerce';
+
+        apartmentData.style.display = isParking ? 'none' : 'block';
+        parkingData.style.display = isParking ? 'block' : 'none';
+
+        roomsField.style.display = isCommerce ? 'none' : 'block';
+        if (isCommerce) {
+            roomsInput.value = '';
+        }
+
+        if (isParking) {
             totalArea.value = 25;
             totalArea.disabled = true;
-        }else {
-            // Для "квартиры" и другого - включаем поля квартиры
-            apartmentData.style.display = 'block'; 
-            parkingData.style.display = 'none';
-            totalArea.value = null;
+        } else {
+            // Чистим площадь только если уходим с парковки,
+            // чтобы переключение квартира <-> коммерция не стирало ввод
+            if (totalArea.disabled) {
+                totalArea.value = '';
+            }
             totalArea.disabled = false;
         }
     }
@@ -114,83 +127,104 @@ async function generateContract() {
 
 // Сбор данных из формы
 function collectFormData() {
-    const total_area = Number(document.getElementById('total_area').value);
-    const pricePerSquare = Number(document.getElementById('price_per_square').value);
-    const initial_payment = Number(document.getElementById('initial_payment').value);
+    const value = (id) => document.getElementById(id).value;
+
+    const total_area = Number(value('total_area'));
+    const pricePerSquare = Number(value('price_per_square'));
+    const initial_payment = Number(value('initial_payment'));
     const totalPrice = pricePerSquare * total_area;
     const initialPaymentPercent = calculateInitialPaymentPercent(totalPrice, initial_payment);
-    const isApartmentType = document.getElementById('property_type').value === "apartment";
 
-    if(isApartmentType){
-        return {
-            isCashContract: document.getElementById('contract').value === "cash",
-            isApartmentType: isApartmentType,
-            fullname: document.getElementById('fullname').value,
-            shortname: getShortName(document.getElementById('fullname').value),
-            birthdate: formatDate(document.getElementById('birthdate').value),
-            phone_number: document.getElementById('phone_number').value,
-            passport: document.getElementById('passport').value,
-            passport_issue_date: formatDate(document.getElementById('passport_issue_date').value),
-            passport_issued_by: document.getElementById('passport_issued_by').value,
-            passport_division_code: document.getElementById('passport_division_code').value,
-            registration_address: document.getElementById('registration_address').value,
-            living_address: document.getElementById('living_address').value,
-            building: document.getElementById('building').value,
-            construction_number: document.getElementById('construction_number').value,
-            floor: document.getElementById('floor').value,
-            rooms: document.getElementById('rooms').value,
-            installment_period: document.getElementById('installment_period').value,
-            price_per_square: formatNumberWithSpaces(pricePerSquare),
-            area: document.getElementById('area').value,
-            initial_payment: formatNumberWithSpaces(initial_payment),
-            initial_payment_percent: initialPaymentPercent,
-            price: formatNumberWithSpaces(totalPrice),
-            
-            current_date: formatDate(document.getElementById('current_date').value, true),
-        };
-    }
-    
-    return {
-        isCashContract: document.getElementById('contract').value === "cash",
+    const propertyType = value('property_type');
+    const isApartmentType = propertyType === 'apartment';
+    const isCommerceType = propertyType === 'commerce';
+    const isParkingType = propertyType === 'parking';
+
+    // Общая часть для всех типов недвижимости
+    const baseData = {
+        isCashContract: value('contract') === 'cash',
+        propertyType: propertyType,
         isApartmentType: isApartmentType,
-        fullname: document.getElementById('fullname').value,
-        shortname: getShortName(document.getElementById('fullname').value),
-        birthdate: formatDate(document.getElementById('birthdate').value),
-        phone_number: document.getElementById('phone_number').value,
-        passport: document.getElementById('passport').value,
-        passport_issue_date: formatDate(document.getElementById('passport_issue_date').value),
-        passport_issued_by: document.getElementById('passport_issued_by').value,
-        passport_division_code: document.getElementById('passport_division_code').value,
-        registration_address: document.getElementById('registration_address').value,
-        living_address: document.getElementById('living_address').value,
-        parking_num: document.getElementById('parking_num').value,
-        installment_period: document.getElementById('installment_period').value,
+        isCommerceType: isCommerceType,
+        isParkingType: isParkingType,
+        fullname: value('fullname'),
+        shortname: getShortName(value('fullname')),
+        birthdate: formatDate(value('birthdate')),
+        phone_number: value('phone_number'),
+        passport: value('passport'),
+        passport_issue_date: formatDate(value('passport_issue_date')),
+        passport_issued_by: value('passport_issued_by'),
+        passport_division_code: value('passport_division_code'),
+        registration_address: value('registration_address'),
+        living_address: value('living_address'),
+        installment_period: value('installment_period'),
         price_per_square: formatNumberWithSpaces(pricePerSquare),
         initial_payment: formatNumberWithSpaces(initial_payment),
         initial_payment_percent: initialPaymentPercent,
         price: formatNumberWithSpaces(totalPrice),
-        
-        current_date: formatDate(document.getElementById('current_date').value, true),
+
+        current_date: formatDate(value('current_date'), true),
     };
+
+    if (isParkingType) {
+        return {
+            ...baseData,
+            parking_num: value('parking_num'),
+        };
+    }
+
+    // Квартира и коммерция: одинаковый набор полей объекта,
+    // отличие только в количестве комнат — у коммерции его нет
+    const objectData = {
+        ...baseData,
+        building: value('building'),
+        construction_number: value('construction_number'),
+        floor: value('floor'),
+        area: value('area'),
+    };
+
+    if (isApartmentType) {
+        objectData.rooms = value('rooms');
+    }
+
+    return objectData;
 }
+
+// Шаблоны договоров: тип недвижимости -> тип договора
+const CONTRACT_TEMPLATES = {
+    apartment: {
+        cash: 'template.docx',
+        installment: 'template-installment.docx',
+    },
+    commerce: {
+        cash: 'template-commerce.docx',
+        installment: 'template-installment-commerce.docx',
+    },
+    parking: {
+        cash: 'template-parking.docx',
+        installment: 'template-parking-installment.docx',
+    },
+};
 
 // Заполнение DOCX шаблона
 async function fillDocxTemplate(data) {
     const paymentData = data.isCashContract ? {} : getPaymentDataForWord();
-    let templateName = 'template.docx';
-    
-    if(data.isApartmentType) {
-        templateName = data.isCashContract ? 'template.docx' : 'template-installment.docx'
-    } else {
-        templateName = data.isCashContract ? 'template-parking.docx' : 'template-parking-installment.docx'
-    }
+
+    const templates = CONTRACT_TEMPLATES[data.propertyType] || CONTRACT_TEMPLATES.apartment;
+    const templateName = data.isCashContract ? templates.cash : templates.installment;
 
     const response = await fetch(templateName);
     const templateBuffer = await response.arrayBuffer();
     
     const zip = new PizZip(templateBuffer);
 
-    const doc = new docxtemplater(zip, {paragraphLoop: true, linebreaks: true});
+    // nullGetter: чтобы отсутствующий тег (например {rooms} в коммерции)
+    // не подставлял в документ строку "undefined"
+    const doc = new docxtemplater(zip, {
+        paragraphLoop: true,
+        linebreaks: true,
+        nullGetter: () => '',
+    });
 
     // Заполняем шаблон данными
     const documentData = {
